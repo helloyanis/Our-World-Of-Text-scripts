@@ -9,12 +9,19 @@ function teleport(x=null, y=null){
     px=x;
     py=y;
   }
-  if(px=="max"||px=="maximum"||px=="maxi")
+  if(px=="max"||px=="maximum"||px=="maxi"||px=="maxx")
   {
     px=14073748835532;
   }
-  else if(px=="min"||px=="minimum"||px=="mini"){
+  else if(px=="min"||px=="minimum"||px=="mini"||px=="minx"){
     px=-14073748835532;
+  }
+  else if(px=="maxy")
+  {
+    px=15637498706147;
+  }
+  else if(px=="miny"){
+    px=-15637498706147;
   }
   else{
     px=parseInt(px);
@@ -26,8 +33,20 @@ function teleport(x=null, y=null){
     var py=prompt('Enter your Y coordinates (none if you want to keep the same, "max" or "min" for normal teleport limits.)',positionY / tileH / 4);
     if(py==null) return;
   }
-  if(py=="max"||py=="maximum"||py=="maxi") py=14073748835532;
-  else if(py=="min"||py=="minimum"||py=="mini") py=-14073748835532;
+  if(py=="max"||py=="maximum"||py=="maxi"||py=="maxy")
+  {
+    py=15637498706147;
+  }
+  else if(py=="min"||py=="minimum"||py=="mini"||py=="miny"){
+    py=-15637498706147;
+  }
+  else if(px=="maxx")
+  {
+    py=14073748835532;
+  }
+  else if(px=="minx"){
+    py=-14073748835532;
+  }
   else{
     py=parseInt(py);
     if(isNaN(py)){
