@@ -1,3 +1,13 @@
+// ==UserScript==
+// @name         OwOteleport
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  This script teleports you anywhere even past the max coordinates you can usually teleport to! Do teleport() in console, or teleport(xcoord,ycoord). Leave a field empty to not change it. Type in "max" or ""min" to go to the world borders.
+// @author       helloyanis
+// @match        *://*.ourworldoftext.com/*
+// @icon         https://samrayner.com/teleport/assets/images/teleport.png
+// @grant        none
+// ==/UserScript==
 //This script teleports you anywhere even past the max coordinates you can usually teleport to! Do teleport() in console, or teleport(xcoord,ycoord). Leave a field empty to not change it. Type in "max" or ""min" to go to the world borders.
 menu.addOption("Ultra teleport",
 function teleport(x=null, y=null){
@@ -23,14 +33,24 @@ function teleport(x=null, y=null){
   else if(px=="miny"){
     px=-15637498706147;
   }
+  else if(px=="maxx")
+  {
+    py=14073748835532;
+  }
+  else if(px=="minx"){
+    py=-14073748835532;
+  }
+  else if(px=="far"){
+      px=2251799813685248
+  }
   else{
-    px=parseInt(px);
+    px=parseFloat(px);
     if(isNaN(px)){
       console.log("No number detected for X, not changing X coords..");
     }
   }
   if(!x && !y){
-    var py=prompt('Enter your Y coordinates (none if you want to keep the same, "max" or "min" for normal teleport limits.)',positionY / tileH / 4);
+    var py=prompt('Enter your Y coordinates (none if you want to keep the same, "max" or "min" for normal teleport limits, "far" or "-far" for the farlands.)',positionY / tileH / 4);
     if(py==null) return;
   }
   if(py=="max"||py=="maximum"||py=="maxi"||py=="maxy")
@@ -40,15 +60,17 @@ function teleport(x=null, y=null){
   else if(py=="min"||py=="minimum"||py=="mini"||py=="miny"){
     py=-15637498706147;
   }
-  else if(px=="maxx")
-  {
-    py=14073748835532;
+  else if(py=="far"){
+      py=2251799813685248
   }
-  else if(px=="minx"){
-    py=-14073748835532;
+  else if(px=="-far"){
+      px=-2251799813685248
+  }
+  else if(py=="-far"){
+      py=-2251799813685248
   }
   else{
-    py=parseInt(py);
+    py=parseFloat(py);
     if(isNaN(py)){
       console.log("No number detected for Y, not changing Y coords..");
     }
