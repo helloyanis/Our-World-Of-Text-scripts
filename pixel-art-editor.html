@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel art</title>
+</head>
+<body>
+    <div class="input">
+        <input type="number" required placeholder="↔️" id="wide">
+        <input type="number" required placeholder="↕️" id="height">
+        <button id="gen">Generate pixel grid</button>
+        <input type="checkbox" id="fill"><dfn title="If this is checked, white pixels will be drawn. If this is not checked, white pixels won't be drawn. Lowers draw time but breaks for night theme.">Fill white/empty pixels</dfn></input>
+        <input type="checkbox" id="double"><dfn title="If this is checked, pixels will be drawn twice, so the image doesn't appear stretched up. Doubles drawing time. This should be checked on small drawings.">Doube pixels</dfn></input>
+    </div>
+    <input type="color" id="colorpick">
+    <table id="board" cellspacing="0" cellpadding="0"></table>
+</body>
+<script>
+    function rgbToHex(col)
+    {
+        if(col.charAt(0)=='r')
+        {
+            col=col.replace('rgb(','').replace(')','').split(',');
+            var r=parseInt(col[0], 10).toString(16);
+            var g=parseInt(col[1], 10).toString(16);
+            var b=parseInt(col[2], 10).toString(16);
+            r=r.length==1?'0'+r:r; g=g.length==1?'0'+g:g; b=b.length==1?'0'+b:b;
+            var colHex='#'+r+g+b;
+            return colHex;
+        }
+    }
+
+    document.getElementById("gen").onclick=function(){
+        wide=document.getElementById("wide").value;
+        height=document.getElementById("height").value;
+        if(wide==""||height==""){
+            return alert("You must enter two numbers to generate the grid!")
+        }
+        document.getElementById("board").innerHTML=""
+        p=0
+        for (let i = 0; i < height; i++) {
+            
+        document.getElementById("board").innerHTML+="<tr class='row'></tr>"
+            for (let j = 0; j < wide; j++) {
+                
+                document.getElementsByClassName("row")[i].innerHTML+="<td id='pixel'></td>"
+            }
+        }
+        elt=document.createElement("button")
+        elt.innerHTML="Generate text"
+        elt.setAttribute("id","textgen")
+        document.body.appendChild(elt);
+        elt=document.createElement("br")
+        document.body.appendChild(elt);
+        
+        routine()
+        function routine(){
+
+            [].forEach.call(document.getElementsByTagName('td'), function(cell) { 
+            cell.addEventListener('click', function() {
+            cell.style.backgroundColor = document.getElementById('colorpick').value;
+            }, false); 
+        });
+        document.getElementById("textgen").onclick=function(){
+            try {
+                document.getElementsByTagName("textarea")[0].remove()
+            } catch (error) {
+                
+            }
+            text="";
+            for (let i = 0; i < document.getElementsByTagName("tr").length; i++) {
+                const row = document.getElementsByTagName("tr")[i];
+                for (let j = 0; j < row.getElementsByTagName("td").length; j++) {
+                    const pixel = row.getElementsByTagName("td")[j];
+                    if(pixel.style.backgroundColor==""||pixel.style.backgroundColor=="rgb(255, 255, 255)"){
+                        console.log("Got undefined")
+                        if(document.getElementById("fill").checked){
+                            if(document.getElementById("double").checked){
+                                text+="Fffffff█Fffffff█"
+                            }else{
+                                text+="Fffffff█"
+                            }
+                            
+                        }else{
+                            if(document.getElementById("double").checked){
+                                text+="  "
+                            }else{
+                                text+=" "
+                            }
+                        }
+                        
+                    }
+                    else{
+                        if(document.getElementById("double").checked){
+                            text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                        }else{
+                            text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                        }
+                    }
+                    
+                }
+                if(i+1!=document.getElementsByTagName("tr").length){
+                    text+="\r\n"
+                }
+                
+            }
+            console.log(text)
+            let elt=document.createElement("textarea")
+            elt.innerHTML=text
+            elt.setAttribute("rows","4")
+            elt.setAttribute("cols","50")
+            document.body.appendChild(elt);
+            routine()
+        }
+    }
+}
+
+routine()  
+</script>
+<style>
+    td{
+        display: inline;
+        height:10px;
+        width:10px;
+        margin: 0;
+        border: 1px solid black;
+        background-color: white;
+    }
+    tr{
+        display: flex;
+        flex-wrap: nowrap;
+    }
+</style>
+</html>
