@@ -1,13 +1,3 @@
-// ==UserScript==
-// @name         OwOteleport
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  This script teleports you anywhere even past the max coordinates you can usually teleport to! Do teleport() in console, or teleport(xcoord,ycoord). Leave a field empty to not change it. Type in "max" or ""min" to go to the world borders.
-// @author       helloyanis
-// @match        *://*.ourworldoftext.com/*
-// @icon         https://samrayner.com/teleport/assets/images/teleport.png
-// @grant        none
-// ==/UserScript==
 //This script teleports you anywhere even past the max coordinates you can usually teleport to! Do teleport() in console, or teleport(xcoord,ycoord). Leave a field empty to not change it. Type in "max" or ""min" to go to the world borders.
 menu.addOption("Ultra teleport",
 function teleport(x=null, y=null){
