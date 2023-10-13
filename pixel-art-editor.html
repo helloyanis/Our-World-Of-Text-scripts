@@ -11,13 +11,24 @@
         <input type="number" required placeholder="↔️" id="wide">
         <input type="number" required placeholder="↕️" id="height">
         <button id="gen">Generate pixel grid</button>
+        <input type="file" id="import" value="Import image" title="Import image to convert into pixel art" accept="image/png, image/jpeg"></input>
+        <br>
         <input type="checkbox" id="fill"><dfn title="If this is checked, white pixels will be drawn. If this is not checked, white pixels won't be drawn. Lowers draw time but breaks for night theme.">Fill white/empty pixels</dfn></input>
         <input type="checkbox" id="double"><dfn title="If this is checked, pixels will be drawn twice, so the image doesn't appear stretched up. Doubles drawing time. This should be checked on small drawings.">Doube pixels</dfn></input>
+        <input type="checkbox" id="togglegrid"><dfn title="If this is checked, the grid will be hidden.">Hide grid</dfn></input>
+
     </div>
     <input type="color" id="colorpick">
     <table id="board" cellspacing="0" cellpadding="0"></table>
 </body>
 <script>
+    var mouseDown = 0;
+        document.body.onmousedown = function() { 
+        ++mouseDown;
+    }
+        document.body.onmouseup = function() {
+        --mouseDown;
+    }
     function rgbToHex(col)
     {
         if(col.charAt(0)=='r')
@@ -31,39 +42,118 @@
             return colHex;
         }
     }
+    document.querySelector("#togglegrid").onclick=function(){
+        if(document.querySelector("#togglegrid").checked){
+            document.querySelectorAll("td").forEach(element => {
+                element.style.border="none"
+            });
+        }else{
+            document.querySelectorAll("td").forEach(element => {
+                element.style.border="1px solid rgb(88, 88, 88)"
+            });
+        }
+    }
+    document.querySelector("#import").addEventListener("change", handleFiles, false);
+        function handleFiles(){
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            console.log(0)
+            reader.onload = function (event) {
+                const image = new Image();
+                image.onload = async function () {
+                    if(image.width>=300||image.height>=300){
+                        if(confirm("The image is too big! It must be 300x300 or less. Continue? (The image will be cropped)")){
+                            if(image.width>300){
+                                image.width=300
+                            }else{
+                                image.height=300
+                            }
+                        }else{
+                            return
+                        }
+                    }
+                    document.querySelector("body").classList.add("loading")
+                    document.querySelector("html").classList.add("loading")
+                    document.querySelector("#import").disabled = true
+                    console.log(1)
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    // Les données des pixels de l'image sont maintenant disponibles
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    context.drawImage(image, 0, 0);
+                    const imageData = context.getImageData(0, 0, image.width, image.height);
+                    const pixelData = imageData.data;
+                    document.querySelector("#wide").value=image.width
+                    document.querySelector("#height").value=image.height
+                    document.querySelector("#gen").click()
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    console.log(2)
+                    let rowIndex = 0;
+                    let colIndex = 0;
+                    for (let i = 0; i < pixelData.length; i += 4) {
+                        const red = pixelData[i];
+                        const green = pixelData[i + 1];
+                        const blue = pixelData[i + 2];
+                        const alpha = pixelData[i + 3];
 
-    document.getElementById("gen").onclick=function(){
-        wide=document.getElementById("wide").value;
-        height=document.getElementById("height").value;
+                        if (alpha !== 0) {
+                            const pixel = document.querySelectorAll("tr")[rowIndex].getElementsByTagName("td")[colIndex];
+                            pixel.style.backgroundColor = "rgb(" + red + "," + green + "," + blue + ")";
+                        }
+
+                        colIndex++;
+                        if (colIndex >= wide) {
+                            colIndex = 0;
+                            rowIndex++;
+                        }
+                    }
+
+                };
+                image.src = event.target.result;
+            };
+
+            reader.readAsDataURL(file);
+            document.querySelector("body").classList.remove("loading")
+            document.querySelector("html").classList.remove("loading")
+            document.querySelector("#import").disabled = false
+        }
+    document.querySelector("#gen").onclick=function(){
+        wide=document.querySelector("#wide").value;
+        height=document.querySelector("#height").value;
         if(wide==""||height==""){
             return alert("You must enter two numbers to generate the grid!")
         }
-        document.getElementById("board").innerHTML=""
+        document.body.style.cursor = "wait";
+        document.querySelector("#board").innerHTML=""
         p=0
         for (let i = 0; i < height; i++) {
             
-        document.getElementById("board").innerHTML+="<tr class='row'></tr>"
+        document.querySelector("#board").innerHTML+="<tr class='row'></tr>"
             for (let j = 0; j < wide; j++) {
                 
-                document.getElementsByClassName("row")[i].innerHTML+="<td id='pixel'></td>"
+                document.querySelectorAll(".row")[i].innerHTML+="<td id='pixel'></td>"
             }
         }
+        if (document.querySelector("#textgen") == null) {
         elt=document.createElement("button")
         elt.innerHTML="Generate text"
         elt.setAttribute("id","textgen")
         document.body.appendChild(elt);
+        }
         elt=document.createElement("br")
         document.body.appendChild(elt);
-        
+        document.body.style.cursor = "default";
         routine()
         function routine(){
-
             [].forEach.call(document.getElementsByTagName('td'), function(cell) { 
-            cell.addEventListener('click', function() {
-            cell.style.backgroundColor = document.getElementById('colorpick').value;
-            }, false); 
+            cell.addEventListener("click",function(){
+                cell.style.backgroundColor = document.getElementById('colorpick').value;
+            }); 
+            cell.addEventListener("mouseover",function(){
+            if(mouseDown) cell.style.backgroundColor = document.getElementById('colorpick').value;
+            }); 
         });
-        document.getElementById("textgen").onclick=function(){
+        document.querySelector("#textgen").onclick=function(){
             try {
                 document.getElementsByTagName("textarea")[0].remove()
             } catch (error) {
@@ -75,16 +165,15 @@
                 for (let j = 0; j < row.getElementsByTagName("td").length; j++) {
                     const pixel = row.getElementsByTagName("td")[j];
                     if(pixel.style.backgroundColor==""||pixel.style.backgroundColor=="rgb(255, 255, 255)"){
-                        console.log("Got undefined")
-                        if(document.getElementById("fill").checked){
-                            if(document.getElementById("double").checked){
+                        if(document.querySelector("#fill").checked){
+                            if(document.querySelector("#double").checked){
                                 text+="Fffffff█Fffffff█"
                             }else{
                                 text+="Fffffff█"
                             }
                             
                         }else{
-                            if(document.getElementById("double").checked){
+                            if(document.querySelector("#double").checked){
                                 text+="  "
                             }else{
                                 text+=" "
@@ -93,7 +182,7 @@
                         
                     }
                     else{
-                        if(document.getElementById("double").checked){
+                        if(document.querySelector("#double").checked){
                             text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
                         }else{
                             text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
@@ -125,12 +214,21 @@ routine()
         height:10px;
         width:10px;
         margin: 0;
-        border: 1px solid black;
+        border: 1px solid rgb(88, 88, 88);
         background-color: white;
     }
     tr{
         display: flex;
         flex-wrap: nowrap;
+        user-drag: none;
+        -webkit-user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    .loading{
+        cursor: wait;
     }
 </style>
 </html>
