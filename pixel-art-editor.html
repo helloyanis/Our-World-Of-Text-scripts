@@ -88,21 +88,17 @@
             reader.onload = function (event) {
                 const image = new Image();
                 image.onload = async function () {
-                    if(image.width>=300||image.height>=300){
-                        if(confirm("The image is too big! It must be 300x300 or less. Continue? (The image will be cropped)")){
-                            if(image.width>300){
-                                image.width=300
-                            }else{
-                                image.height=300
-                            }
-                        }else{
-                            return
-                        }
-                    }
+                    
                     // Les données des pixels de l'image sont maintenant disponibles
+                    // Ajustez la taille du canvas pour correspondre à celle de l'image
                     const canvas = document.createElement('canvas');
+                    canvas.width = image.width; // Définissez la largeur du canvas égale à celle de l'image
+                    canvas.height = image.height; // Définissez la hauteur du canvas égale à celle de l'image
+
                     const context = canvas.getContext('2d');
-                    context.drawImage(image, 0, 0);
+                    context.drawImage(image, 0, 0); // Dessinez l'image sur le canvas à partir du coin supérieur gauche (0,0)
+
+                    // Continuez avec le traitement du canvas si nécessaire
                     const imageData = context.getImageData(0, 0, image.width, image.height);
                     const pixelData = imageData.data;
                     document.querySelector("#wide").value=image.width
