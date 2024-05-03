@@ -313,24 +313,44 @@
                                 if (document.querySelector("#fill").checked) {
 
                                     if (document.querySelector("#isLink").checked) {
-                                        text += `$u"${document.querySelector("#linkUrl").value}"  `
+                                        if (document.querySelector("#double").checked) {
+                                            text += `$u"${document.querySelector("#linkUrl").value}"Fffffff█$u"${document.querySelector("#linkUrl").value}"Fffffff█`
+                                        }else{
+                                            text += `$u"${document.querySelector("#linkUrl").value}"Fffffff█`
+                                        }
                                     } else {
-                                        text += "Fffffff█"
+                                        if(document.querySelector("#double").checked){
+                                            text += "Fffffff█Fffffff█"
+                                        }else{
+                                            text += "Fffffff█"
+                                        }
                                     }
 
 
                                 } else {
-
-                                    text += " "
+                                    if(document.querySelector("#double").checked){
+                                        text += "  "
+                                    }else{
+                                        text += " "
+                                    }
 
                                 }
                             }
                             else {
 
                                 if (document.querySelector("#isLink").checked) {
-                                    text += `$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█`
+                                    if (document.querySelector("#double").checked) {
+                                        text += `$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█`
+                                    } else {
+                                        text += `$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█`
+                                    }
+                                    
                                 } else {
-                                    text += "F" + rgbToHex(pixel.style.backgroundColor).substring(1) + "█"
+                                    if(document.querySelector("#double").checked){
+                                        text += "F" + rgbToHex(pixel.style.backgroundColor).substring(1) + "█" + "F" + rgbToHex(pixel.style.backgroundColor).substring(1) + "█"
+                                    }else{
+                                        text += "F" + rgbToHex(pixel.style.backgroundColor).substring(1) + "█"
+                                    }
                                 }
 
                             }
