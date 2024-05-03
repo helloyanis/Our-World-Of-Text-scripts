@@ -286,9 +286,9 @@
                                     }
                                 } else {
                                     if (document.querySelector("#isLink").checked) {
-                                        text += `$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}▀`
+                                        text += `$u"${document.querySelector("#linkUrl").value}"b${rgbToHex(pixel2.style.backgroundColor).substring(1)}F${rgbToHex(pixel1.style.backgroundColor).substring(1)}▀`
                                     } else {
-                                        text += "F" + rgbToHex(pixel1.style.backgroundColor).substring(1) + "▀"
+                                        text += `b${rgbToHex(pixel2.style.backgroundColor).substring(1)}F${rgbToHex(pixel1.style.backgroundColor).substring(1)}▀`
                                     }
                                 }
                             }
