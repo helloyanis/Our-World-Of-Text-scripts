@@ -14,10 +14,11 @@
         <input type="file" id="import" value="Import image" title="Import image to convert into pixel art" accept="image/png, image/jpeg"></input>
         <br>
         <input type="checkbox" id="fill"><dfn title="If this is checked, white pixels will be drawn. If this is not checked, white pixels won't be drawn. Lowers draw time but breaks for night theme.">Fill white/empty pixels</dfn></input>
+        <input type="checkbox" id="isLink"><dfn title="If this is checked, the image will also be a ling to an URL">URL link</dfn></input>
+        <input type="url" id="linkUrl" placeholder="URL" disabled="true"></input>
         <input type="checkbox" id="double" disabled="true"><dfn title="If this is checked, pixels will be drawn twice, so the image doesn't appear stretched up. Doubles drawing time. This should be checked on small drawings.">Doube pixels</dfn></input>
         <input type="checkbox" id="tiny" checked="true"><dfn title="If this is checked, a special character will be used that allows for the drawing to be smaller.">Tiny pixels</dfn></input>
         <input type="checkbox" id="togglegrid"><dfn title="If this is checked, the grid will be hidden.">Hide grid</dfn></input>
-
     </div>
     <input type="color" id="colorpick">
     <table id="board" cellspacing="0" cellpadding="0"></table>
@@ -25,10 +26,10 @@
 <script>
     var mouseDown = 0;
         document.body.onmousedown = function() { 
-        ++mouseDown;
+        mouseDown=1
     }
         document.body.onmouseup = function() {
-        --mouseDown;
+        mouseDown=0;
     }
     function rgbToHex(col)
     {
@@ -70,6 +71,13 @@
             document.querySelector("#tiny").checked=false
         }else{
             document.querySelector("#tiny").removeAttribute("disabled")
+        }
+    }
+    document.querySelector("#isLink").onclick=function(){
+        if(document.querySelector("#isLink").checked){
+            document.querySelector("#linkUrl").removeAttribute("disabled")
+        }else{
+            document.querySelector("#linkUrl").setAttribute("disabled","true")
         }
     }
     document.querySelector("#import").addEventListener("change", handleFiles, false);
@@ -121,6 +129,7 @@
                             rowIndex++;
                         }
                     }
+                    mouseDown=0
 
                 };
                 image.src = event.target.result;
@@ -207,9 +216,17 @@
                             if (pixel1.style.backgroundColor == pixel2.style.backgroundColor) {
                             if(document.querySelector("#fill").checked){
                                 if(document.querySelector("#double").checked){
-                                    text+="Fffffff█Fffffff█"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"Fffffff█$u"${document.querySelector("#linkUrl").value}"Fffffff█`
+                                    }else{
+                                        text+="Fffffff█Fffffff█"
+                                    }
                                 }else{
-                                    text+="Fffffff█"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"Fffffff█`
+                                    }else{
+                                        text+="Fffffff█"
+                                    }
                                 }
                                 
                             }else{
@@ -223,24 +240,48 @@
                             if(pixel1.style.backgroundColor==""||pixel1.style.backgroundColor=="rgb(255, 255, 255)"){
                                 if(document.querySelector("#fill").checked){
                                 if(document.querySelector("#double").checked){
-                                    text+="bffffffF"+ rgbToHex(pixel2.style.backgroundColor).substring(1)+"▄F"+ rgbToHex(pixel2.style.backgroundColor).substring(1) +"▄x"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"Fffffff█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel2.style.backgroundColor).substring(1)}█`
+                                    }else{
+                                        text+="bffffffF"+ rgbToHex(pixel2.style.backgroundColor).substring(1)+"▄F"+ rgbToHex(pixel2.style.backgroundColor).substring(1) +"▄x"
+                                    }
                                 }else{
-                                    text+="F"+ rgbToHex(pixel2.style.backgroundColor).substring(1) +"▄"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"Fffffff█$u"${document.querySelector("#linkUrl").value}"F"+ rgbToHex(pixel2.style.backgroundColor).substring(1) +"█"`
+                                    }else{
+                                        text+="F"+ rgbToHex(pixel2.style.backgroundColor).substring(1) +"▄"
+                                    }
                                 }
                                 
                             }else{
                                 if (document.querySelector("#double").checked) {
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                    }else{
                                         text += "F" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "▄F" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "▄"
+                                    }
                                     } else {
-                                        text += "F" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "▄"
+                                        if(document.querySelector("#isLink").checked){
+                                            text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                        }else{
+                                            text += "F" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "▄"
+                                        }
                                     }
                             }
                             }else{
                                 if(document.querySelector("#fill").checked){
                                 if(document.querySelector("#double").checked){
-                                    text+="F"+ rgbToHex(pixel1.style.backgroundColor).substring(1)+"▀bffffffF"+ rgbToHex(pixel1.style.backgroundColor).substring(1) +"▀x"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                    }else{
+                                        text+="F"+ rgbToHex(pixel1.style.backgroundColor).substring(1)+"▀bffffffF"+ rgbToHex(pixel1.style.backgroundColor).substring(1) +"▀x"
+                                    }
                                 }else{
-                                    text+="F"+ rgbToHex(pixel1.style.backgroundColor).substring(1) +"▀"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                    }else{
+                                        text+="F"+ rgbToHex(pixel1.style.backgroundColor).substring(1) +"▀"
+                                    }
                                 }
                             }
                         }
@@ -248,9 +289,17 @@
                         }
                         }else{
                             if(pixel1.style.backgroundColor==pixel2.style.backgroundColor){
-                            text+="F" + rgbToHex(pixel1.style.backgroundColor).substring(1) +"█"
+                                if(document.querySelector("#isLink").checked){
+                                    text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                }else{
+                                    text+="F" + rgbToHex(pixel1.style.backgroundColor).substring(1) +"█"
+                                }
                         }else{
-                            text+="b" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "F" + rgbToHex(pixel1.style.backgroundColor).substring(1) + "▀x"
+                            if(document.querySelector("#isLink").checked){
+                                text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel2.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                            }else{
+                                text+="b" + rgbToHex(pixel2.style.backgroundColor).substring(1) + "F" + rgbToHex(pixel1.style.backgroundColor).substring(1) + "▀x"
+                            }
                         }
                         }
                         
@@ -269,25 +318,40 @@
                         if(pixel.style.backgroundColor==""||pixel.style.backgroundColor=="rgb(255, 255, 255)"){
                             if(document.querySelector("#fill").checked){
                                 if(document.querySelector("#double").checked){
-                                    text+="Fffffff█Fffffff█"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"  $u"${document.querySelector("#linkUrl").value}"  `
+                                    }else{
+                                        text+="Fffffff█Fffffff█"
+                                    }
                                 }else{
-                                    text+="Fffffff█"
+                                    if(document.querySelector("#isLink").checked){
+                                        text+=`$u"${document.querySelector("#linkUrl").value}"  `
+                                    }else{
+                                        text+="Fffffff█"
+                                    }
                                 }
                                 
                             }else{
                                 if(document.querySelector("#double").checked){
                                     text+="  "
                                 }else{
-                                    text+=" "
+                                     text+=" "
                                 }
                             }
-                            
                         }
                         else{
                             if(document.querySelector("#double").checked){
-                                text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                                if(document.querySelector("#isLink").checked){
+                                    text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█`
+                                }else{
+                                    text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                                }
                             }else{
-                                text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                                if(document.querySelector("#isLink").checked){
+                                    text+=`$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel.style.backgroundColor).substring(1)}█`
+                                }else{
+                                    text+="F"+rgbToHex(pixel.style.backgroundColor).substring(1)+"█"
+                                }
                             }
                         }
                         
@@ -324,7 +388,6 @@ routine()
     tr{
         display: flex;
         flex-wrap: nowrap;
-        user-drag: none;
         -webkit-user-drag: none;
         user-select: none;
         -moz-user-select: none;
