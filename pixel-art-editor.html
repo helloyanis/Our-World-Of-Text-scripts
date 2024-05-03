@@ -56,7 +56,7 @@
             var colHex = '#' + r + g + b;
             return colHex;
         } else {
-            return "ffffff"
+            return "#ffffff"
         }
     }
     document.querySelector("#togglegrid").onclick = function () {
@@ -223,7 +223,7 @@
                                 for (let j = 0; j < row1.querySelectorAll("td").length; j++) {
                                     const pixel1 = row1.querySelectorAll("td")[j];
                                     const pixel2 = document.createElement("td");
-                                    pixel2.style.backgroundColor = "white"
+                                    // pixel2.style.backgroundColor = "white"
                                     row2.appendChild(pixel2)
                                 }
                                 document.querySelector("#board").appendChild(row2)
@@ -234,7 +234,7 @@
                         for (let j = 0; j < row1.querySelectorAll("td").length; j++) {
                             const pixel1 = row1.querySelectorAll("td")[j];
                             const pixel2 = row2.querySelectorAll("td")[j];
-                            if (pixel1.style.backgroundColor == "" || pixel1.style.backgroundColor == "rgb(255, 255, 255)" || pixel2.style.backgroundColor == "" || pixel2.style.backgroundColor == "rgb(255, 255, 255)") {
+                            if (pixel1.style.backgroundColor == "" || pixel2.style.backgroundColor == "" || pixel1.style.backgroundColor == "rgb(255,255,255)" || pixel2.style.backgroundColor == "rgb(255,255,255)") {
                                 if (pixel1.style.backgroundColor == pixel2.style.backgroundColor) {
                                     if (document.querySelector("#fill").checked) {
                                         if (document.querySelector("#isLink").checked) {
@@ -243,10 +243,14 @@
                                             text += "Fffffff█"
                                         }
                                     } else {
-                                        text += " "
+                                        if (document.querySelector("#isLink").checked) {
+                                            text += `$u"${document.querySelector("#linkUrl").value}"F${rgbToHex(pixel1.style.backgroundColor).substring(1)}█`
+                                        } else {
+                                            text += "F" + rgbToHex(pixel1.style.backgroundColor).substring(1) + "█"
+                                        }
                                     }
                                 } else {
-                                    if (pixel1.style.backgroundColor == "" || pixel1.style.backgroundColor == "rgb(255, 255, 255)") {
+                                    if (pixel1.style.backgroundColor == "" || pixel1.style.backgroundColor == "rgb(255,255,255)") {
                                         if (document.querySelector("#fill").checked) {
                                             if (document.querySelector("#isLink").checked) {
                                                 text += `$u"${document.querySelector("#linkUrl").value}"bffffffF${+ rgbToHex(pixel2.style.backgroundColor).substring(1)}▄`
@@ -305,7 +309,7 @@
                         console.log(row)
                         for (let j = 0; j < row.querySelectorAll("td").length; j++) {
                             const pixel = row.querySelectorAll("td")[j];
-                            if (pixel.style.backgroundColor == "" || pixel.style.backgroundColor == "rgb(255, 255, 255)") {
+                            if (pixel.style.backgroundColor == "") {
                                 if (document.querySelector("#fill").checked) {
 
                                     if (document.querySelector("#isLink").checked) {
