@@ -14,28 +14,41 @@
         <input type="number" required placeholder="↕️" id="height">
         <button id="gen">Generate pixel grid</button>
         <input type="file" id="import" value="Import image" title="Import image to convert into pixel art"
-            accept="image/png, image/jpeg"></input>
+            accept="image/png, image/jpeg"/></input>
         <br>
         <input type="checkbox" id="fill"><dfn
             title="If this is checked, white pixels will be drawn. If this is not checked, white pixels won't be drawn. Lowers draw time but breaks for night theme.">Fill
             white/empty pixels</dfn></input>
-        <input type="checkbox" id="isLink"><dfn title="If this is checked, the image will also be a ling to an URL">URL
+        <input type="checkbox" id="isLink"><dfn title="If this is checked, the image will also be a link to an URL">URL
             link</dfn></input>
         <input type="url" id="linkUrl" placeholder="URL" disabled="true"></input>
-        <input type="checkbox" id="double" disabled="true"><dfn
+        <input type="checkbox" id="double"><dfn
             title="If this is checked, pixels will be drawn twice, so the image doesn't appear stretched up. Doubles drawing time. This should be checked on small drawings.">Doube
             pixels</dfn></input>
-        <input type="checkbox" id="tiny" checked="true"><dfn
-            title="If this is checked, a special character will be used that allows for the drawing to be smaller.">Tiny
+        <input type="checkbox" id="tiny"><dfn
+            title="If this is checked, a special character will be used that allows for the drawing to be smaller. Does not work on main world at the moment because you need background cell color permission.">Tiny
             pixels</dfn></input>
+        <input type="checkbox" id="trimend" checked="true"><dfn
+            title="If this is checked, the line break will happen early when there is no more pixels on the line (to avoid wasting time pasting spaces).">Trim
+            end of lines (recommended)</dfn></input>
         <input type="checkbox" id="togglegrid"><dfn title="If this is checked, the grid will be hidden.">Hide
-            grid</dfn></input>
+            grid</dfn></input><br>
+        <input type="color" id="colorpick">
     </div>
-    <input type="color" id="colorpick">
-    <table id="board" cellspacing="0" cellpadding="0" oncontextmenu="return false;"></table>
+    <div id="content">
+        <table id="board" cellspacing="0" cellpadding="0" oncontextmenu="return false;"></table>
+    </div>
+    
+    <!--The following text is for credit, please don't remove it! Thanks (●'◡'●)-->
+    <p id="offlineWarning">You are not using the latest online version, please <a href="https://xn--0ci5768mq9c.ws/Our-World-Of-Text-scripts/pixel-art-editor.html">check the online version</a> for new features and optimizations.<br>(This does not mean a new version is out, but you chould check if there is!)</p>
+    <p><a href="https://github.com/helloyanis/Our-World-Of-Text-scripts">View on GitHub</a>!</p>
 </body>
 <script>
-    var mouseDown = 0;
+    if(document.location.hostname=="xn--0ci5768mq9c.ws"){
+        document.querySelector("#offlineWarning").style.display = "none"
+    }
+    let mouseDown = 0;
+    let loading = false;
     document.body.onmousedown = function () {
         handleMouseDown()
     }
@@ -75,7 +88,7 @@
             // document.querySelector("#double").setAttribute("disabled", "true")
             document.querySelector("#double").checked = false
         } else {
-            document.querySelector("#double").removeAttribute("disabled")
+            //document.querySelector("#double").removeAttribute("disabled")
         }
     }
     document.querySelector("#double").onclick = function () {
@@ -83,7 +96,7 @@
             // document.querySelector("#tiny").setAttribute("disabled", "true")
             document.querySelector("#tiny").checked = false
         } else {
-            document.querySelector("#tiny").removeAttribute("disabled")
+            //document.querySelector("#tiny").removeAttribute("disabled")
         }
     }
     document.querySelector("#isLink").onclick = function () {
@@ -95,6 +108,7 @@
     }
     document.querySelector("#import").addEventListener("change", handleFiles, false);
     function handleFiles() {
+        document.body.classList.add("loading")
         const file = event.target.files[0];
         const reader = new FileReader();
         console.log(0)
@@ -108,8 +122,9 @@
                 canvas.width = image.width; // Définissez la largeur du canvas égale à celle de l'image
                 canvas.height = image.height; // Définissez la hauteur du canvas égale à celle de l'image
                 if (image.width > 200 || image.height > 200) {
-                    if (!confirm(`The image is big and may take a long time to load, and may freeze your browser. Do you want to continue? (Recommended dimensions: 200x200 or below, your image is ${image.width}x${image.height})`)) {
-                        return
+                    if (!confirm(`The image is big and may take a long time to load, and may freeze your browser. Do you want to continue? (Recommended dimensions: 200x200 or below, your image is ${image.width}x${image.height})\n\nImport time estimated at around ${0.001*(image.width*image.height)} seconds, can vary depending on your browser and device.`)) {
+                        document.body.classList.remove("loading")
+                        return loading = false
                     }
                 }
                 const context = canvas.getContext('2d');
@@ -157,7 +172,7 @@
         if (wide == "" || height == "") {
             return alert("You must enter two numbers to generate the grid!")
         }
-        document.body.style.cursor = "wait";
+        document.body.classList.add("loading")
         document.querySelector("#board").innerHTML = ""
 
         let tableHTML = "";
@@ -174,11 +189,11 @@
             elt = document.createElement("button")
             elt.innerHTML = "Generate text"
             elt.setAttribute("id", "textgen")
-            document.body.appendChild(elt);
+            document.querySelector("#content").appendChild(elt);
         }
         elt = document.createElement("br")
-        document.body.appendChild(elt);
-        document.body.style.cursor = "default";
+        document.querySelector("#content").appendChild(elt);
+        document.body.classList.remove("loading")
         routine()
         function routine() {
             [].forEach.call(document.querySelectorAll('td'), function (cell) {
@@ -362,13 +377,17 @@
 
                     }
                 }
-
+                if(document.querySelector("#trimend").checked){
+                    text = text.split('\n')
+                    .map(line => line.trimEnd())
+                    .join('\n');
+                }
                 console.log(text)
                 let elt = document.createElement("textarea")
                 elt.innerHTML = text
                 elt.setAttribute("rows", "4")
                 elt.setAttribute("cols", "50")
-                document.body.appendChild(elt);
+                document.querySelector("#content").appendChild(elt);
                 routine()
             }
         }
@@ -394,6 +413,13 @@
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
+    }
+
+    body {
+        min-height: 100vh;
+    }
+    .loading:hover{
+        cursor: wait;
     }
 </style>
 
